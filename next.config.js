@@ -4,7 +4,21 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ['localhost'],
+    domains: ['localhost', 'images.unsplash.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.ngrok.io',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.ngrok-free.app',
+        port: '',
+        pathname: '/**',
+      }
+    ],
     unoptimized: true
   },
   async rewrites() {

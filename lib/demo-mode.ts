@@ -44,4 +44,21 @@ export const simulateGeneration = async (type: keyof typeof DEMO_IMAGES): Promis
  */
 export const isDemoMode = (): boolean => {
   return DEMO_MODE;
+};
+
+/**
+ * 检查 ComfyUI 服务器是否可用
+ */
+export const checkComfyUIAvailability = async (): Promise<boolean> => {
+  try {
+    const comfyuiUrl = process.env.COMFYUI_URL || 'http://localhost:8188';
+    const response = await fetch(`${comfyuiUrl}/system_stats`, {
+      method: 'GET',
+      timeout: 5000
+    });
+    return response.ok;
+  } catch (error) {
+    console.warn('ComfyUI 服务器不可用，将使用演示模式:', error);
+    return false;
+  }
 }; 
