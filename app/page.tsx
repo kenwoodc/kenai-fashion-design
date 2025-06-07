@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles, Image, Palette, Wand2, ArrowRight } from 'lucide-react';
+import { Sparkles, Image, Palette, Wand2, ArrowRight, Shirt, Brush, Users } from 'lucide-react';
 import Link from 'next/link';
 
 /**
@@ -15,20 +15,39 @@ export default function Home() {
       description: '通过文字描述生成服装设计图',
       icon: Wand2,
       available: true,
+      color: 'bg-blue-100 text-blue-600',
     },
     {
-      id: 'image-to-image',
-      title: '图生图',
-      description: '基于现有图片生成新的设计',
-      icon: Image,
-      available: false,
+      id: 'sketch-to-image',
+      title: '线稿生图',
+      description: '将服装线稿转换为彩色设计图',
+      icon: Brush,
+      available: true,
+      color: 'bg-purple-100 text-purple-600',
     },
     {
-      id: 'style-transfer',
-      title: '风格转换',
-      description: '将设计转换为不同风格',
+      id: 'colored-sketch-to-image',
+      title: '上色线稿生图',
+      description: '优化已上色线稿的图像质量',
       icon: Palette,
-      available: false,
+      available: true,
+      color: 'bg-orange-100 text-orange-600',
+    },
+    {
+      id: 'model-dressing',
+      title: '模特换装',
+      description: '智能服装与模特图像合成',
+      icon: Users,
+      available: true,
+      color: 'bg-green-100 text-green-600',
+    },
+    {
+      id: 'fabric-application',
+      title: '服装材质应用',
+      description: '为服装应用不同材质效果',
+      icon: Shirt,
+      available: true,
+      color: 'bg-pink-100 text-pink-600',
     },
   ];
 
@@ -80,34 +99,34 @@ export default function Home() {
         {/* 功能特性 */}
         <div className="mb-16">
           <h3 className="text-3xl font-bold text-gray-900 text-center mb-12">核心功能</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {features.map((feature) => {
               const IconComponent = feature.icon;
               return (
                 <div
                   key={feature.id}
-                  className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 hover:shadow-md transition-shadow duration-200"
+                  className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:scale-105 transition-all duration-200"
                 >
-                  <div className="flex items-center justify-center w-16 h-16 bg-primary-100 rounded-xl mb-6 mx-auto">
-                    <IconComponent className="h-8 w-8 text-primary-600" />
+                  <div className={`flex items-center justify-center w-14 h-14 ${feature.color} rounded-xl mb-4 mx-auto`}>
+                    <IconComponent className="h-7 w-7" />
                   </div>
-                  <h4 className="text-xl font-semibold text-gray-900 text-center mb-4">
+                  <h4 className="text-lg font-semibold text-gray-900 text-center mb-3">
                     {feature.title}
                   </h4>
-                  <p className="text-gray-600 text-center mb-6">
+                  <p className="text-gray-600 text-center text-sm mb-4 leading-relaxed">
                     {feature.description}
                   </p>
                   <div className="text-center">
                     {feature.available ? (
                       <Link
                         href="/ai-create"
-                        className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium"
+                        className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors"
                       >
                         立即体验
-                        <ArrowRight className="h-4 w-4 ml-1" />
+                        <ArrowRight className="h-3 w-3 ml-1" />
                       </Link>
                     ) : (
-                      <span className="text-gray-400 text-sm">即将推出</span>
+                      <span className="text-gray-400 text-xs">即将推出</span>
                     )}
                   </div>
                 </div>
@@ -120,9 +139,9 @@ export default function Home() {
         <div className="bg-gradient-to-r from-primary-50 to-blue-50 rounded-3xl p-12 mb-16">
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-gray-900 mb-4">为什么选择KenAI？</h3>
-            <p className="text-lg text-gray-600">专业、高效、创新的AI设计解决方案</p>
+            <p className="text-lg text-gray-600">5大AI功能，全方位服装设计解决方案</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             <div className="text-center">
               <div className="text-3xl font-bold text-primary-600 mb-2">⚡</div>
               <h4 className="font-semibold text-gray-900 mb-2">快速生成</h4>
@@ -130,18 +149,23 @@ export default function Home() {
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-primary-600 mb-2">🎨</div>
-              <h4 className="font-semibold text-gray-900 mb-2">专业品质</h4>
-              <p className="text-sm text-gray-600">高质量的设计输出</p>
+              <h4 className="font-semibold text-gray-900 mb-2">多样化创作</h4>
+              <p className="text-sm text-gray-600">5种不同的AI生成模式</p>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-primary-600 mb-2">💡</div>
-              <h4 className="font-semibold text-gray-900 mb-2">创意无限</h4>
-              <p className="text-sm text-gray-600">AI助力突破设计瓶颈</p>
+              <h4 className="font-semibold text-gray-900 mb-2">智能优化</h4>
+              <p className="text-sm text-gray-600">AI自动优化设计效果</p>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-primary-600 mb-2">🔧</div>
               <h4 className="font-semibold text-gray-900 mb-2">易于使用</h4>
               <p className="text-sm text-gray-600">简单直观的操作界面</p>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary-600 mb-2">📱</div>
+              <h4 className="font-semibold text-gray-900 mb-2">实时预览</h4>
+              <p className="text-sm text-gray-600">即时查看生成结果</p>
             </div>
           </div>
         </div>
@@ -154,22 +178,22 @@ export default function Home() {
               <div className="flex items-center justify-center w-12 h-12 bg-primary-600 text-white rounded-full text-xl font-bold mx-auto mb-4">
                 1
               </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">描述想法</h4>
-              <p className="text-gray-600">用文字详细描述您想要的服装设计</p>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">选择创作模式</h4>
+              <p className="text-gray-600">从5种AI生成模式中选择最适合的创作方式</p>
             </div>
             <div className="relative">
               <div className="flex items-center justify-center w-12 h-12 bg-primary-600 text-white rounded-full text-xl font-bold mx-auto mb-4">
                 2
               </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">AI生成</h4>
-              <p className="text-gray-600">AI理解您的需求并生成专业设计图</p>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">输入创作素材</h4>
+              <p className="text-gray-600">上传图片或输入文字描述，提供创作灵感</p>
             </div>
             <div className="relative">
               <div className="flex items-center justify-center w-12 h-12 bg-primary-600 text-white rounded-full text-xl font-bold mx-auto mb-4">
                 3
               </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">下载使用</h4>
-              <p className="text-gray-600">获得高质量设计图，用于您的项目</p>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">获得设计作品</h4>
+              <p className="text-gray-600">AI智能生成高质量设计图，支持下载和管理</p>
             </div>
           </div>
         </div>
