@@ -68,8 +68,7 @@
   },
   "79": {
     "inputs": {
-      "text": "连衣裙，有两个口袋",
-      "speak_and_recognation": true
+      "text": "连衣裙，有两个口袋"
     },
     "class_type": "TextInput_",
     "_meta": {
@@ -83,7 +82,7 @@
         0
       ],
       "clip": [
-        "89",
+        "104",
         0
       ]
     },
@@ -130,20 +129,6 @@
     "class_type": "NunchakuFluxDiTLoader",
     "_meta": {
       "title": "Nunchaku FLUX DiT Loader"
-    }
-  },
-  "89": {
-    "inputs": {
-      "model_type": "flux",
-      "text_encoder1": "clip_l.safetensors",
-      "text_encoder2": "t5xxl_fp16.safetensors",
-      "t5_min_length": 512,
-      "use_4bit_t5": "disable",
-      "int4_model": "none"
-    },
-    "class_type": "NunchakuTextEncoderLoader",
-    "_meta": {
-      "title": "Nunchaku Text Encoder Loader"
     }
   },
   "90": {
@@ -197,6 +182,18 @@
     "class_type": "ImageScaleToTotalPixels",
     "_meta": {
       "title": "图像按像素缩放"
+    }
+  },
+  "104": {
+    "inputs": {
+      "model_type": "flux.1",
+      "text_encoder1": "clip_l.safetensors",
+      "text_encoder2": "t5xxl_fp16.safetensors",
+      "t5_min_length": 512
+    },
+    "class_type": "NunchakuTextEncoderLoaderV2",
+    "_meta": {
+      "title": "Nunchaku Text Encoder Loader V2"
     }
   }
 }
