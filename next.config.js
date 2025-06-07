@@ -1,18 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   reactStrictMode: true,
   swcMinify: true,
   images: {
     domains: ['localhost'],
+    unoptimized: true
   },
   async rewrites() {
     return [
       {
         source: '/api/comfyui/:path*',
-        destination: 'http://127.0.0.1:8188/:path*',
-      },
-    ];
+        destination: process.env.COMFYUI_URL ? `${process.env.COMFYUI_URL}/:path*` : 'http://localhost:8188/:path*'
+      }
+    ]
   },
-};
+  env: {
+    COMFYUI_URL: process.env.COMFYUI_URL || 'http://localhost:8188'
+  }
+}
 
-module.exports = nextConfig; 
+module.exports = nextConfig 
