@@ -189,11 +189,11 @@ export default function FabricApplicationGenerator() {
                 const newWork = {
                   id: Date.now().toString(),
                   type: 'fabric-application',
-                  // 只保存描述文本，不保存图片数据
-                  description,
+                  description: description,
                   resultCount: images.length,
+                  images: images, // 保存图片URL
+                  timestamp: Date.now(),
                   createdAt: new Date().toISOString(),
-                  // 不保存图片预览数据以节省空间
                 }
                 
                 // 限制保存的作品数量，避免存储溢出

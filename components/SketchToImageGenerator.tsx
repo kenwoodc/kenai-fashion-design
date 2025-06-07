@@ -199,6 +199,8 @@ export default function SketchToImageGenerator() {
                     type: 'sketch-to-image',
                     description: sketchPrompt,
                     resultCount: images.length,
+                    images: images, // 保存图片URL
+                    timestamp: Date.now(),
                     createdAt: new Date().toISOString(),
                   }
                   

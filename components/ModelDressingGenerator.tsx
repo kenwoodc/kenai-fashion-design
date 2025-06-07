@@ -204,11 +204,11 @@ export default function ModelDressingGenerator() {
                 const newWork = {
                   id: Date.now().toString(),
                   type: 'model-dressing',
-                  // 只保存描述文本，不保存图片数据
-                  description,
+                  description: description,
                   resultCount: images.length,
+                  images: images,
+                  timestamp: Date.now(),
                   createdAt: new Date().toISOString(),
-                  // 不保存图片预览数据以节省空间
                 }
                 
                 // 限制保存的作品数量，避免存储溢出

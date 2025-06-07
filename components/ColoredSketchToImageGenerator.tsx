@@ -199,6 +199,8 @@ export default function ColoredSketchToImageGenerator() {
                     type: 'colored-sketch-to-image',
                     description: coloredSketchPrompt,
                     resultCount: images.length,
+                    images: images, // 保存图片URL
+                    timestamp: Date.now(),
                     createdAt: new Date().toISOString(),
                   }
                   

@@ -232,10 +232,13 @@ export default function TextToImageGenerator() {
                   const newWork = {
                     id: Date.now().toString(),
                     type: 'text-to-image',
+                    description: prompt,
                     prompt,
                     aspectRatio,
                     imageCount,
                     resultCount: images.length,
+                    images: images, // 保存图片URL
+                    timestamp: Date.now(),
                     createdAt: new Date().toISOString(),
                   }
                   
