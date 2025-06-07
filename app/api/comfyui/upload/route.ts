@@ -3,9 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
+    const comfyuiUrl = process.env.COMFYUI_URL || 'http://localhost:8188';
     
     // 转发到ComfyUI的上传接口
-    const comfyuiResponse = await fetch('http://127.0.0.1:8188/upload/image', {
+    const comfyuiResponse = await fetch(`${comfyuiUrl}/upload/image`, {
       method: 'POST',
       body: formData,
     });

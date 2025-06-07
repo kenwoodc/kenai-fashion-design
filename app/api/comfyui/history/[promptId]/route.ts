@@ -9,8 +9,9 @@ export async function GET(
 ) {
   try {
     const { promptId } = params;
+    const comfyuiUrl = process.env.COMFYUI_URL || 'http://localhost:8188';
     
-    const response = await fetch(`http://127.0.0.1:8188/history/${promptId}`, {
+    const response = await fetch(`${comfyuiUrl}/history/${promptId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

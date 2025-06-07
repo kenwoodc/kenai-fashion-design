@@ -17,7 +17,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const url = new URL('http://127.0.0.1:8188/view');
+    const comfyuiUrl = process.env.COMFYUI_URL || 'http://localhost:8188';
+    const url = new URL(`${comfyuiUrl}/view`);
     url.searchParams.set('filename', filename);
     if (subfolder) url.searchParams.set('subfolder', subfolder);
     url.searchParams.set('type', type);
