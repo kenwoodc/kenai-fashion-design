@@ -52,10 +52,17 @@ export const isDemoMode = (): boolean => {
 export const checkComfyUIAvailability = async (): Promise<boolean> => {
   try {
     const comfyuiUrl = process.env.COMFYUI_URL || 'http://localhost:8188';
+    
+    // 使用 AbortController 实现超时
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    
     const response = await fetch(`${comfyuiUrl}/system_stats`, {
       method: 'GET',
-      timeout: 5000
+      signal: controller.signal
     });
+    
+    clearTimeout(timeoutId);
     return response.ok;
   } catch (error) {
     console.warn('ComfyUI 服务器不可用，将使用演示模式:', error);

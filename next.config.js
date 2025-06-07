@@ -4,7 +4,7 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ['localhost', 'images.unsplash.com'],
+    domains: ['localhost', 'images.unsplash.com', 'us8372439qz.vicp.fun'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -15,6 +15,18 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: '*.ngrok-free.app',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: '*.vicp.fun',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.vicp.fun',
         port: '',
         pathname: '/**',
       }
