@@ -122,9 +122,15 @@ export default function TextToImageGenerator() {
   const [aspectRatio, setAspectRatio] = useState('1:1');
   const [imageCount, setImageCount] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [results, setResults] = useState<GenerationResult[]>([]);
+  const [results, setResults] = useState<string[]>([]);
   const [error, setError] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [currentGeneration, setCurrentGeneration] = useState<{
+    prompt: string;
+    aspectRatio: string;
+    imageCount: number;
+    timestamp: number;
+  } | null>(null);
 
   /**
    * 生成图片 - 文生图
@@ -137,6 +143,14 @@ export default function TextToImageGenerator() {
 
     setIsGenerating(true);
     setError('');
+    
+    // 设置当前生成信息
+    setCurrentGeneration({
+      prompt,
+      aspectRatio,
+      imageCount,
+      timestamp: Date.now()
+    });
 
     try {
       // 读取工作流配置
@@ -210,26 +224,34 @@ export default function TextToImageGenerator() {
               }
 
               if (images.length > 0) {
-                const newResult: GenerationResult = {
-                  id: `work-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                  images,
-                  prompt,
-                  timestamp: Date.now(),
-                  aspectRatio,
-                  imageCount
-                };
-                setResults(prev => [newResult, ...prev]);
-
-                // 保存到localStorage
-                const workItem: WorkItem = {
-                  id: `work-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                  prompt,
-                  images,
-                  timestamp: Date.now(),
-                  type: 'text-to-image'
-                };
-                saveWorkToStorage(workItem);
-                resolve();
+                setResults(images)
+                
+                // 优化存储：只保存必要信息，避免存储大图片数据
+                try {
+                  const savedWorks = JSON.parse(localStorage.getItem('kenai-works') || '[]')
+                  const newWork = {
+                    id: Date.now().toString(),
+                    type: 'text-to-image',
+                    prompt,
+                    aspectRatio,
+                    imageCount,
+                    resultCount: images.length,
+                    createdAt: new Date().toISOString(),
+                  }
+                  
+                  // 限制保存的作品数量，避免存储溢出
+                  savedWorks.unshift(newWork)
+                  if (savedWorks.length > 50) {
+                    savedWorks.splice(50) // 只保留最新的50个作品
+                  }
+                  
+                  localStorage.setItem('kenai-works', JSON.stringify(savedWorks))
+                } catch (storageError) {
+                  console.warn('存储作品到本地失败，但生成成功:', storageError)
+                  // 存储失败不影响图片生成结果
+                }
+                
+                resolve()
               } else {
                 reject(new Error('未找到生成的图片'));
               }
@@ -278,10 +300,11 @@ export default function TextToImageGenerator() {
   };
 
   /**
-   * 清除结果
+   * 清除所有结果和输入
    */
   const handleClearResults = () => {
     setResults([]);
+    setCurrentGeneration(null);
     setError('');
   };
 
@@ -410,85 +433,83 @@ export default function TextToImageGenerator() {
       {/* 右侧：图片展示 */}
       <div className="flex-1 min-w-0">
         {/* 生成结果 */}
-        {results.length > 0 ? (
+        {results.length > 0 && currentGeneration ? (
           <div className="space-y-6">
             <h3 className="text-lg font-semibold text-gray-900">生成结果</h3>
             
-            {results.map((result, index) => (
-              <div key={result.timestamp} className="border border-gray-200 rounded-xl p-6 space-y-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-4 mb-2">
-                      <p className="text-sm text-gray-600">
-                        {new Date(result.timestamp).toLocaleString('zh-CN')}
-                      </p>
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                        文生图
-                      </span>
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {result.aspectRatio}
-                      </span>
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        {result.imageCount} 张
-                      </span>
-                    </div>
-                    <p className="text-gray-800 bg-gray-50 rounded-lg p-3 text-sm">
-                      {result.prompt}
+            <div className="border border-gray-200 rounded-xl p-6 space-y-4">
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <div className="flex items-center gap-4 mb-2">
+                    <p className="text-sm text-gray-600">
+                      {new Date(currentGeneration.timestamp).toLocaleString('zh-CN')}
                     </p>
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      文生图
+                    </span>
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {currentGeneration.aspectRatio}
+                    </span>
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      {currentGeneration.imageCount} 张
+                    </span>
                   </div>
-                </div>
-
-                <div className={`grid gap-4 ${
-                  result.images.length === 1 ? 'grid-cols-1 max-w-md mx-auto' :
-                  result.images.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
-                  'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                }`}>
-                  {result.images.map((imageUrl, imageIndex) => (
-                    <div key={imageIndex} className="relative group cursor-pointer">
-                      <img
-                        src={imageUrl}
-                        alt={`生成的图片 ${imageIndex + 1}`}
-                        className="w-full h-auto max-h-96 object-contain rounded-lg border border-gray-200 transition-transform duration-200 group-hover:scale-105 bg-gray-50"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuWbvueJh+WKoOi9veWksei0pTwvdGV4dD48L3N2Zz4=';
-                        }}
-                        onClick={() => setSelectedImage(imageUrl)}
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedImage(imageUrl);
-                          }}
-                          className="opacity-0 group-hover:opacity-100 bg-white text-gray-700 p-2 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200"
-                          title="放大查看"
-                        >
-                          <ZoomIn className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDownload(imageUrl, result.prompt);
-                          }}
-                          className="opacity-0 group-hover:opacity-100 bg-white text-gray-700 p-2 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200"
-                          title="下载图片"
-                        >
-                          <Download className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                  <p className="text-gray-800 bg-gray-50 rounded-lg p-3 text-sm">
+                    {currentGeneration.prompt}
+                  </p>
                 </div>
               </div>
-            ))}
+
+              <div className={`grid gap-4 ${
+                results.length === 1 ? 'grid-cols-1 max-w-md mx-auto' :
+                results.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
+                'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+              }`}>
+                {results.map((imageUrl, imageIndex) => (
+                  <div key={imageIndex} className="relative group cursor-pointer">
+                    <img
+                      src={imageUrl}
+                      alt={`生成的图片 ${imageIndex + 1}`}
+                      className="w-full h-auto max-h-96 object-contain rounded-lg border border-gray-200 transition-transform duration-200 group-hover:scale-105 bg-gray-50"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuWbvueJh+WKoOi9veWksei0pTwvdGV4dD48L3N2Zz4=';
+                      }}
+                      onClick={() => setSelectedImage(imageUrl)}
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedImage(imageUrl);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 bg-white text-gray-700 p-2 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200"
+                        title="放大查看"
+                      >
+                        <ZoomIn className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDownload(imageUrl, currentGeneration.prompt);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 bg-white text-gray-700 p-2 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200"
+                        title="下载图片"
+                      >
+                        <Download className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         ) : (
           <div className="flex items-center justify-center h-full">
             <div className="text-center text-gray-500">
               <Sparkles className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p className="text-lg font-medium mb-2">开始您的创作之旅</p>
-              <p className="text-sm">输入提示词并点击生成图片</p>
+              <p className="text-sm">输入描述文字，选择画面比例和出图数量，即可生成精美的服装设计图</p>
             </div>
           </div>
         )}

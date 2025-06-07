@@ -6,40 +6,50 @@ import Link from 'next/link';
 import TextToImageGenerator from '@/components/TextToImageGenerator';
 import SketchToImageGenerator from '@/components/SketchToImageGenerator';
 import ColoredSketchToImageGenerator from '@/components/ColoredSketchToImageGenerator';
+import FabricApplicationGenerator from '@/components/FabricApplicationGenerator';
+import ModelDressingGenerator from '@/components/ModelDressingGenerator';
 
 /**
  * AI创作页面组件
  */
 export default function AICreatePage() {
-  const [activeFeature, setActiveFeature] = useState('文生图');
+  const [activeFeature, setActiveFeature] = useState('text-to-image');
 
   const features = [
     {
-      id: '文生图',
+      id: 'text-to-image',
       name: '文生图',
       description: '通过文字描述生成服装设计',
-      icon: Sparkles,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-      borderColor: 'border-purple-200'
+      icon: '✨',
+      color: 'bg-blue-50 border-blue-200 text-blue-800'
     },
     {
-      id: '线稿生图',
+      id: 'sketch-to-image', 
       name: '线稿生图',
       description: '基于线稿图生成服装设计',
-      icon: Image,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200'
+      icon: '🎨',
+      color: 'bg-green-50 border-green-200 text-green-800'
     },
     {
-      id: '上色线稿生图',
-      name: '上色线稿生图',
+      id: 'colored-sketch-to-image',
+      name: '上色线稿生图', 
       description: '基于已上色线稿生成服装设计',
-      icon: Palette,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-      borderColor: 'border-orange-200'
+      icon: '🖌️',
+      color: 'bg-purple-50 border-purple-200 text-purple-800'
+    },
+    {
+      id: 'fabric-application',
+      name: '服装材质应用',
+      description: '将面料材质应用到服装设计上',
+      icon: '🧵',
+      color: 'bg-orange-50 border-orange-200 text-orange-800'
+    },
+    {
+      id: 'model-dressing',
+      name: '模特换装',
+      description: '为模特换上不同的服装',
+      icon: '👗',
+      color: 'bg-pink-50 border-pink-200 text-pink-800'
     }
   ];
 
@@ -84,7 +94,6 @@ export default function AICreatePage() {
           {/* 功能选择 */}
           <div className="space-y-3">
             {features.map((feature) => {
-              const Icon = feature.icon;
               const isActive = activeFeature === feature.id;
               
               return (
@@ -94,13 +103,15 @@ export default function AICreatePage() {
                   className={`
                     w-full text-left p-4 rounded-xl border-2 transition-all duration-200
                     ${isActive 
-                      ? `${feature.bgColor} ${feature.borderColor} shadow-sm` 
+                      ? `${feature.color} shadow-sm` 
                       : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
                     }
                   `}
                 >
                   <div className="flex items-start space-x-3">
-                    <Icon className={`h-6 w-6 mt-0.5 ${isActive ? feature.color : 'text-gray-400'}`} />
+                    <span className={`text-2xl mt-0.5`}>
+                      {feature.icon}
+                    </span>
                     <div className="flex-1">
                       <h3 className={`font-semibold ${isActive ? 'text-gray-900' : 'text-gray-700'}`}>
                         {feature.name}
@@ -120,9 +131,11 @@ export default function AICreatePage() {
         <div className="flex-1 flex flex-col">
           {/* 功能内容区域 */}
           <div className="flex-1 p-6 overflow-y-auto">
-            {activeFeature === '文生图' && <TextToImageGenerator />}
-            {activeFeature === '线稿生图' && <SketchToImageGenerator />}
-            {activeFeature === '上色线稿生图' && <ColoredSketchToImageGenerator />}
+            {activeFeature === 'text-to-image' && <TextToImageGenerator />}
+            {activeFeature === 'sketch-to-image' && <SketchToImageGenerator />}
+            {activeFeature === 'colored-sketch-to-image' && <ColoredSketchToImageGenerator />}
+            {activeFeature === 'fabric-application' && <FabricApplicationGenerator />}
+            {activeFeature === 'model-dressing' && <ModelDressingGenerator />}
           </div>
         </div>
       </main>

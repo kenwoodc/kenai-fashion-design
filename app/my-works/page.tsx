@@ -6,10 +6,13 @@ import Link from 'next/link';
 
 interface WorkItem {
   id: string;
-  prompt: string;
-  images: string[];
+  description: string;
+  resultCount?: number;
+  images?: string[];
   timestamp: number;
-  type: 'text-to-image' | 'image-to-image' | 'style-transfer';
+  type: string;
+  createdAt?: string;
+  prompt?: string;
 }
 
 /**
@@ -34,7 +37,8 @@ export default function MyWorksPage() {
 
   // 过滤作品
   const filteredWorks = works.filter(work => {
-    const matchesSearch = work.prompt.toLowerCase().includes(searchTerm.toLowerCase());
+    const searchText = work.description || work.prompt || '';
+    const matchesSearch = searchText.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterType === 'all' || work.type === filterType;
     return matchesSearch && matchesFilter;
   });
@@ -42,14 +46,14 @@ export default function MyWorksPage() {
   /**
    * 下载图片
    */
-  const handleDownload = async (imageUrl: string, prompt: string, index: number) => {
+  const handleDownload = async (imageUrl: string, description: string, index: number) => {
     try {
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `kenai-${prompt.slice(0, 20)}-${index + 1}-${Date.now()}.png`;
+      a.download = `kenai-${description.slice(0, 20)}-${index + 1}-${Date.now()}.png`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -139,8 +143,10 @@ export default function MyWorksPage() {
                 >
                   <option value="all">所有类型</option>
                   <option value="text-to-image">文生图</option>
-                  <option value="image-to-image">图生图</option>
-                  <option value="style-transfer">风格转换</option>
+                  <option value="sketch-to-image">线稿生图</option>
+                  <option value="colored-sketch-to-image">上色线稿生图</option>
+                  <option value="fabric-application">材质应用</option>
+                  <option value="model-dressing">模特换装</option>
                 </select>
               </div>
             </div>
@@ -155,7 +161,10 @@ export default function MyWorksPage() {
                       <div className="flex items-center justify-between mb-2">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
                           {work.type === 'text-to-image' ? '文生图' : 
-                           work.type === 'image-to-image' ? '图生图' : '风格转换'}
+                           work.type === 'sketch-to-image' ? '线稿生图' :
+                           work.type === 'colored-sketch-to-image' ? '上色线稿生图' :
+                           work.type === 'fabric-application' ? '材质应用' : 
+                           work.type === 'model-dressing' ? '模特换装' : '未知类型'}
                         </span>
                         <div className="flex items-center text-sm text-gray-500">
                           <Calendar className="h-4 w-4 mr-1" />
@@ -163,35 +172,48 @@ export default function MyWorksPage() {
                         </div>
                       </div>
                       <p className="text-gray-800 bg-gray-50 rounded-lg p-3 text-sm">
-                        {work.prompt}
+                        {work.description || work.prompt || '无描述'}
                       </p>
                     </div>
 
                     {/* 图片展示 */}
-                    <div className="grid grid-cols-2 gap-3">
-                      {work.images.map((imageUrl, imageIndex) => (
-                        <div key={imageIndex} className="relative group">
-                          <img
-                            src={imageUrl}
-                            alt={`作品图片 ${imageIndex + 1}`}
-                            className="w-full h-48 object-cover rounded-lg border border-gray-200"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuWbvueJh+WKoOi9veWksei0pTwvdGV4dD48L3N2Zz4=';
-                            }}
-                          />
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
-                            <button
-                              onClick={() => handleDownload(imageUrl, work.prompt, imageIndex)}
-                              className="opacity-0 group-hover:opacity-100 bg-white text-gray-700 p-2 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200"
-                              title="下载图片"
-                            >
-                              <Download className="h-4 w-4" />
-                            </button>
+                    {work.images && work.images.length > 0 ? (
+                      <div className="grid grid-cols-2 gap-3">
+                        {work.images.map((imageUrl, imageIndex) => (
+                          <div key={imageIndex} className="relative group">
+                            <img
+                              src={imageUrl}
+                              alt={`作品图片 ${imageIndex + 1}`}
+                              className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuWbvueJh+WKoOi9veWksei0pTwvdGV4dD48L3N2Zz4=';
+                              }}
+                            />
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
+                              <button
+                                onClick={() => handleDownload(imageUrl, work.description || work.prompt || '未知', imageIndex)}
+                                className="opacity-0 group-hover:opacity-100 bg-white text-gray-700 p-2 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-200"
+                                title="下载图片"
+                              >
+                                <Download className="h-4 w-4" />
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                        <ImageIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                        <p className="text-sm text-gray-600 mb-2">图片数据已优化清理</p>
+                        <p className="text-xs text-gray-500">
+                          {work.resultCount ? `生成了 ${work.resultCount} 张图片` : '图片预览不可用'}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-2">
+                          为节省存储空间，旧作品的图片数据已被清理
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

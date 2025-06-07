@@ -1,0 +1,1193 @@
+{
+  "10": {
+    "inputs": {
+      "style_model_name": "flux1-redux-dev.safetensors"
+    },
+    "class_type": "StyleModelLoader",
+    "_meta": {
+      "title": "风格模型加载器"
+    }
+  },
+  "11": {
+    "inputs": {
+      "clip_name": "sigclip_vision_patch14_384.safetensors"
+    },
+    "class_type": "CLIPVisionLoader",
+    "_meta": {
+      "title": "CLIP视觉加载器"
+    }
+  },
+  "13": {
+    "inputs": {
+      "vae_name": "ae.sft"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "VAE加载器"
+    }
+  },
+  "17": {
+    "inputs": {
+      "image": "FY3A0141.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "18": {
+    "inputs": {
+      "image": "4 (6).png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "31": {
+    "inputs": {
+      "output_type": "int",
+      "*": [
+        "44",
+        0
+      ]
+    },
+    "class_type": "easy convertAnything",
+    "_meta": {
+      "title": "转换任何"
+    }
+  },
+  "32": {
+    "inputs": {
+      "index": [
+        "31",
+        0
+      ],
+      "value0": [
+        "541",
+        1
+      ],
+      "value1": [
+        "489",
+        1
+      ]
+    },
+    "class_type": "easy anythingIndexSwitch",
+    "_meta": {
+      "title": "编号切换"
+    }
+  },
+  "44": {
+    "inputs": {
+      "mask": [
+        "17",
+        1
+      ]
+    },
+    "class_type": "IsMaskEmpty",
+    "_meta": {
+      "title": "遮罩是否存在"
+    }
+  },
+  "46": {
+    "inputs": {
+      "aspect_ratio": "original",
+      "proportional_width": 1,
+      "proportional_height": 1,
+      "fit": "letterbox",
+      "method": "lanczos",
+      "round_to_multiple": "8",
+      "scale_to_side": "height",
+      "scale_to_length": [
+        "453",
+        0
+      ],
+      "background_color": "#ffffff",
+      "image": [
+        "18",
+        0
+      ],
+      "mask": [
+        "18",
+        1
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "按宽高比缩放_V2"
+    }
+  },
+  "51": {
+    "inputs": {
+      "mask": [
+        "521",
+        0
+      ]
+    },
+    "class_type": "MaskToImage",
+    "_meta": {
+      "title": "遮罩到图像"
+    }
+  },
+  "52": {
+    "inputs": {
+      "mask": [
+        "493",
+        1
+      ]
+    },
+    "class_type": "MaskToImage",
+    "_meta": {
+      "title": "遮罩到图像"
+    }
+  },
+  "72": {
+    "inputs": {
+      "direction": "right",
+      "match_image_size": true,
+      "image1": [
+        "437",
+        0
+      ],
+      "image2": [
+        "493",
+        0
+      ]
+    },
+    "class_type": "ImageConcanate",
+    "_meta": {
+      "title": "图像联结"
+    }
+  },
+  "74": {
+    "inputs": {
+      "direction": "right",
+      "match_image_size": true,
+      "image1": [
+        "303",
+        0
+      ],
+      "image2": [
+        "52",
+        0
+      ]
+    },
+    "class_type": "ImageConcanate",
+    "_meta": {
+      "title": "图像联结"
+    }
+  },
+  "79": {
+    "inputs": {
+      "channel": "red",
+      "image": [
+        "74",
+        0
+      ]
+    },
+    "class_type": "ImageToMask",
+    "_meta": {
+      "title": "图像到遮罩"
+    }
+  },
+  "84": {
+    "inputs": {
+      "downsampling_factor": 1,
+      "downsampling_function": "area",
+      "mode": "keep aspect ratio",
+      "weight": 1,
+      "autocrop_margin": 0.1,
+      "conditioning": [
+        "86",
+        0
+      ],
+      "style_model": [
+        "10",
+        0
+      ],
+      "clip_vision": [
+        "11",
+        0
+      ],
+      "image": [
+        "437",
+        0
+      ],
+      "mask": [
+        "521",
+        0
+      ]
+    },
+    "class_type": "ReduxAdvanced",
+    "_meta": {
+      "title": "ReduxAdvanced"
+    }
+  },
+  "86": {
+    "inputs": {
+      "text": [
+        "557",
+        0
+      ],
+      "clip": [
+        "555",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "89": {
+    "inputs": {
+      "model": [
+        "537",
+        0
+      ]
+    },
+    "class_type": "DifferentialDiffusion",
+    "_meta": {
+      "title": "差异扩散"
+    }
+  },
+  "92": {
+    "inputs": {
+      "guidance": 50,
+      "conditioning": [
+        "84",
+        0
+      ]
+    },
+    "class_type": "FluxGuidance",
+    "_meta": {
+      "title": "Flux引导"
+    }
+  },
+  "93": {
+    "inputs": {
+      "noise_mask": false,
+      "positive": [
+        "92",
+        0
+      ],
+      "negative": [
+        "94",
+        0
+      ],
+      "vae": [
+        "13",
+        0
+      ],
+      "pixels": [
+        "72",
+        0
+      ],
+      "mask": [
+        "79",
+        0
+      ]
+    },
+    "class_type": "InpaintModelConditioning",
+    "_meta": {
+      "title": "内补模型条件"
+    }
+  },
+  "94": {
+    "inputs": {
+      "conditioning": [
+        "86",
+        0
+      ]
+    },
+    "class_type": "ConditioningZeroOut",
+    "_meta": {
+      "title": "条件零化"
+    }
+  },
+  "103": {
+    "inputs": {
+      "samples": [
+        "319",
+        0
+      ],
+      "vae": [
+        "13",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE解码"
+    }
+  },
+  "303": {
+    "inputs": {
+      "width": [
+        "437",
+        3
+      ],
+      "height": [
+        "437",
+        4
+      ],
+      "red": 0,
+      "green": 0,
+      "blue": 0
+    },
+    "class_type": "Image Blank",
+    "_meta": {
+      "title": "空图像"
+    }
+  },
+  "304": {
+    "inputs": {
+      "width": [
+        "498",
+        3
+      ],
+      "height": [
+        "498",
+        4
+      ],
+      "red": 255,
+      "green": 255,
+      "blue": 255
+    },
+    "class_type": "Image Blank",
+    "_meta": {
+      "title": "空图像"
+    }
+  },
+  "305": {
+    "inputs": {
+      "channel": "red",
+      "image": [
+        "307",
+        0
+      ]
+    },
+    "class_type": "ImageToMask",
+    "_meta": {
+      "title": "图像到遮罩"
+    }
+  },
+  "306": {
+    "inputs": {
+      "invert_mask": false,
+      "detect": "mask_area",
+      "top_reserve": 0,
+      "bottom_reserve": 0,
+      "left_reserve": 0,
+      "right_reserve": 0,
+      "round_to_multiple": "8",
+      "image": [
+        "103",
+        0
+      ],
+      "mask": [
+        "305",
+        0
+      ]
+    },
+    "class_type": "LayerUtility: CropByMask V2",
+    "_meta": {
+      "title": "遮罩裁剪_V2"
+    }
+  },
+  "307": {
+    "inputs": {
+      "direction": "right",
+      "match_image_size": false,
+      "image1": [
+        "303",
+        0
+      ],
+      "image2": [
+        "304",
+        0
+      ]
+    },
+    "class_type": "ImageConcanate",
+    "_meta": {
+      "title": "图像联结"
+    }
+  },
+  "309": {
+    "inputs": {
+      "images": [
+        "496",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "319": {
+    "inputs": {
+      "seed": 228214697833968,
+      "steps": 25,
+      "cfg": 1,
+      "sampler_name": "euler",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": [
+        "89",
+        0
+      ],
+      "positive": [
+        "93",
+        0
+      ],
+      "negative": [
+        "93",
+        1
+      ],
+      "latent_image": [
+        "93",
+        2
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "K采样器"
+    }
+  },
+  "329": {
+    "inputs": {
+      "object_to_patch": "diffusion_model",
+      "residual_diff_threshold": 0.07,
+      "start": 0,
+      "end": 1,
+      "max_consecutive_cache_hits": -1,
+      "model": [
+        "89",
+        0
+      ]
+    },
+    "class_type": "ApplyFBCacheOnModel",
+    "_meta": {
+      "title": "Apply First Block Cache"
+    }
+  },
+  "374": {
+    "inputs": {
+      "invert_mask": false,
+      "grow": 20,
+      "blur": 4,
+      "mask": [
+        "515",
+        0
+      ]
+    },
+    "class_type": "LayerMask: MaskGrow",
+    "_meta": {
+      "title": "遮罩扩张"
+    }
+  },
+  "429": {
+    "inputs": {
+      "rgthree_comparer": {
+        "images": [
+          {
+            "name": "A",
+            "selected": true,
+            "url": "/api/view?filename=rgthree.compare._temp_ijjjn_00015_.png&type=temp&subfolder=&rand=0.8527256301140753"
+          },
+          {
+            "name": "B",
+            "selected": true,
+            "url": "/api/view?filename=rgthree.compare._temp_ijjjn_00016_.png&type=temp&subfolder=&rand=0.08317041252529789"
+          }
+        ]
+      },
+      "image_a": [
+        "493",
+        0
+      ],
+      "image_b": [
+        "52",
+        0
+      ]
+    },
+    "class_type": "Image Comparer (rgthree)",
+    "_meta": {
+      "title": "图像对比"
+    }
+  },
+  "437": {
+    "inputs": {
+      "aspect_ratio": "original",
+      "proportional_width": 1,
+      "proportional_height": 1,
+      "fit": "letterbox",
+      "method": "lanczos",
+      "round_to_multiple": "8",
+      "scale_to_side": "height",
+      "scale_to_length": [
+        "453",
+        0
+      ],
+      "background_color": "#000000",
+      "image": [
+        "438",
+        0
+      ],
+      "mask": [
+        "438",
+        1
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "按宽高比缩放_V2"
+    }
+  },
+  "438": {
+    "inputs": {
+      "invert_mask": false,
+      "blend_mode": "normal",
+      "opacity": 100,
+      "x_percent": 50,
+      "y_percent": 50,
+      "mirror": "None",
+      "scale": 1,
+      "aspect_ratio": 1,
+      "rotate": 0,
+      "transform_method": "lanczos",
+      "anti_aliasing": 0,
+      "background_image": [
+        "459",
+        0
+      ],
+      "layer_image": [
+        "439",
+        0
+      ],
+      "layer_mask": [
+        "511",
+        1
+      ]
+    },
+    "class_type": "LayerUtility: ImageBlendAdvance",
+    "_meta": {
+      "title": "混合(高级)"
+    }
+  },
+  "439": {
+    "inputs": {
+      "max_width": [
+        "453",
+        0
+      ],
+      "max_height": [
+        "453",
+        0
+      ],
+      "min_width": 0,
+      "min_height": 0,
+      "crop_if_required": "no",
+      "images": [
+        "468",
+        0
+      ]
+    },
+    "class_type": "ConstrainImage|pysssss",
+    "_meta": {
+      "title": "限制图像区域"
+    }
+  },
+  "453": {
+    "inputs": {
+      "value": 1200
+    },
+    "class_type": "easy int",
+    "_meta": {
+      "title": "整数"
+    }
+  },
+  "454": {
+    "inputs": {
+      "rgthree_comparer": {
+        "images": [
+          {
+            "name": "A",
+            "selected": true,
+            "url": "/api/view?filename=rgthree.compare._temp_zgogj_00015_.png&type=temp&subfolder=&rand=0.4504388836168296"
+          },
+          {
+            "name": "B",
+            "selected": true,
+            "url": "/api/view?filename=rgthree.compare._temp_zgogj_00016_.png&type=temp&subfolder=&rand=0.7961407891807817"
+          }
+        ]
+      },
+      "image_a": [
+        "437",
+        0
+      ],
+      "image_b": [
+        "51",
+        0
+      ]
+    },
+    "class_type": "Image Comparer (rgthree)",
+    "_meta": {
+      "title": "图像对比"
+    }
+  },
+  "459": {
+    "inputs": {
+      "size": "custom",
+      "custom_width": [
+        "471",
+        0
+      ],
+      "custom_height": [
+        "472",
+        1
+      ],
+      "color": "#FFFFFF"
+    },
+    "class_type": "LayerUtility: ColorImage V2",
+    "_meta": {
+      "title": "纯色图像_V2"
+    }
+  },
+  "468": {
+    "inputs": {
+      "invert_mask": false,
+      "detect": "mask_area",
+      "top_reserve": 30,
+      "bottom_reserve": 30,
+      "left_reserve": 30,
+      "right_reserve": 30,
+      "round_to_multiple": "8",
+      "image": [
+        "17",
+        0
+      ],
+      "mask": [
+        "511",
+        1
+      ]
+    },
+    "class_type": "LayerUtility: CropByMask V2",
+    "_meta": {
+      "title": "遮罩裁剪_V2"
+    }
+  },
+  "471": {
+    "inputs": {
+      "image": [
+        "439",
+        0
+      ]
+    },
+    "class_type": "easy imageSize",
+    "_meta": {
+      "title": "图像尺寸"
+    }
+  },
+  "472": {
+    "inputs": {
+      "multiply_by": 2,
+      "add_by": 0,
+      "numberA": [
+        "471",
+        0
+      ]
+    },
+    "class_type": "MultiplicationNode",
+    "_meta": {
+      "title": "乘法"
+    }
+  },
+  "483": {
+    "inputs": {
+      "mask": [
+        "468",
+        1
+      ]
+    },
+    "class_type": "MaskToImage",
+    "_meta": {
+      "title": "遮罩到图像"
+    }
+  },
+  "484": {
+    "inputs": {
+      "max_width": [
+        "453",
+        0
+      ],
+      "max_height": [
+        "453",
+        0
+      ],
+      "min_width": 0,
+      "min_height": 0,
+      "crop_if_required": "no",
+      "images": [
+        "483",
+        0
+      ]
+    },
+    "class_type": "ConstrainImage|pysssss",
+    "_meta": {
+      "title": "限制图像区域"
+    }
+  },
+  "485": {
+    "inputs": {
+      "channel": "red",
+      "image": [
+        "484",
+        0
+      ]
+    },
+    "class_type": "ImageToMask",
+    "_meta": {
+      "title": "图像到遮罩"
+    }
+  },
+  "487": {
+    "inputs": {
+      "size": "custom",
+      "custom_width": 768,
+      "custom_height": 1152,
+      "color": "#000000",
+      "size_as": [
+        "459",
+        0
+      ]
+    },
+    "class_type": "LayerUtility: ColorImage V2",
+    "_meta": {
+      "title": "纯色图像_V2"
+    }
+  },
+  "488": {
+    "inputs": {
+      "invert_mask": false,
+      "blend_mode": "normal",
+      "opacity": 100,
+      "x_percent": 50,
+      "y_percent": 50,
+      "mirror": "None",
+      "scale": 1,
+      "aspect_ratio": 1,
+      "rotate": 0,
+      "transform_method": "lanczos",
+      "anti_aliasing": 0,
+      "background_image": [
+        "487",
+        0
+      ],
+      "layer_image": [
+        "484",
+        0
+      ],
+      "layer_mask": [
+        "485",
+        0
+      ]
+    },
+    "class_type": "LayerUtility: ImageBlendAdvance",
+    "_meta": {
+      "title": "混合(高级)"
+    }
+  },
+  "489": {
+    "inputs": {
+      "aspect_ratio": "original",
+      "proportional_width": 1,
+      "proportional_height": 1,
+      "fit": "letterbox",
+      "method": "lanczos",
+      "round_to_multiple": "8",
+      "scale_to_side": "height",
+      "scale_to_length": [
+        "453",
+        0
+      ],
+      "background_color": "#000000",
+      "image": [
+        "488",
+        0
+      ],
+      "mask": [
+        "488",
+        1
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "按宽高比缩放_V2"
+    }
+  },
+  "492": {
+    "inputs": {
+      "rgthree_comparer": {
+        "images": [
+          {
+            "name": "A",
+            "selected": true,
+            "url": "/api/view?filename=rgthree.compare._temp_cqnap_00015_.png&type=temp&subfolder=&rand=0.05260941499947991"
+          },
+          {
+            "name": "B",
+            "selected": true,
+            "url": "/api/view?filename=rgthree.compare._temp_cqnap_00016_.png&type=temp&subfolder=&rand=0.27645198952980976"
+          }
+        ]
+      },
+      "image_a": [
+        "74",
+        0
+      ],
+      "image_b": [
+        "72",
+        0
+      ]
+    },
+    "class_type": "Image Comparer (rgthree)",
+    "_meta": {
+      "title": "图像对比"
+    }
+  },
+  "493": {
+    "inputs": {
+      "invert_mask": false,
+      "detect": "mask_area",
+      "top_reserve": [
+        "517",
+        0
+      ],
+      "bottom_reserve": [
+        "517",
+        0
+      ],
+      "left_reserve": [
+        "517",
+        0
+      ],
+      "right_reserve": [
+        "517",
+        0
+      ],
+      "round_to_multiple": "8",
+      "image": [
+        "46",
+        0
+      ],
+      "mask": [
+        "374",
+        0
+      ]
+    },
+    "class_type": "LayerUtility: CropByMask V2",
+    "_meta": {
+      "title": "遮罩裁剪_V2"
+    }
+  },
+  "496": {
+    "inputs": {
+      "invert_mask": false,
+      "background_image": [
+        "46",
+        0
+      ],
+      "croped_image": [
+        "499",
+        0
+      ],
+      "crop_box": [
+        "493",
+        2
+      ],
+      "croped_mask": [
+        "493",
+        1
+      ]
+    },
+    "class_type": "LayerUtility: RestoreCropBox",
+    "_meta": {
+      "title": "裁剪恢复"
+    }
+  },
+  "498": {
+    "inputs": {
+      "aspect_ratio": "original",
+      "proportional_width": 1,
+      "proportional_height": 1,
+      "fit": "letterbox",
+      "method": "lanczos",
+      "round_to_multiple": "8",
+      "scale_to_side": "height",
+      "scale_to_length": [
+        "453",
+        0
+      ],
+      "background_color": "#000000",
+      "image": [
+        "493",
+        0
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "按宽高比缩放_V2"
+    }
+  },
+  "499": {
+    "inputs": {
+      "scale": 1,
+      "method": "lanczos",
+      "scale_by": "by_scale",
+      "scale_by_length": 1024,
+      "image": [
+        "306",
+        0
+      ],
+      "original_size": [
+        "498",
+        2
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleRestore V2",
+    "_meta": {
+      "title": "缩放恢复_V2"
+    }
+  },
+  "509": {
+    "inputs": {
+      "text": [
+        "557",
+        0
+      ],
+      "PreviewTextNode_0": "T-shirt"
+    },
+    "class_type": "PreviewTextNode",
+    "_meta": {
+      "title": "预览文本"
+    }
+  },
+  "511": {
+    "inputs": {
+      "torchscript_jit": "default",
+      "image": [
+        "17",
+        0
+      ]
+    },
+    "class_type": "InspyrenetRembg",
+    "_meta": {
+      "title": "Inspyrenet Rembg"
+    }
+  },
+  "512": {
+    "inputs": {
+      "output_type": "int",
+      "*": [
+        "513",
+        0
+      ]
+    },
+    "class_type": "easy convertAnything",
+    "_meta": {
+      "title": "转换任何"
+    }
+  },
+  "513": {
+    "inputs": {
+      "mask": [
+        "18",
+        1
+      ]
+    },
+    "class_type": "IsMaskEmpty",
+    "_meta": {
+      "title": "遮罩是否存在"
+    }
+  },
+  "514": {
+    "inputs": {
+      "index": [
+        "512",
+        0
+      ],
+      "value0": [
+        "46",
+        1
+      ],
+      "value1": [
+        "556",
+        1
+      ]
+    },
+    "class_type": "easy anythingIndexSwitch",
+    "_meta": {
+      "title": "编号切换"
+    }
+  },
+  "515": {
+    "inputs": {
+      "masks": [
+        "514",
+        0
+      ]
+    },
+    "class_type": "Mask Fill Holes",
+    "_meta": {
+      "title": "遮罩填充漏洞"
+    }
+  },
+  "517": {
+    "inputs": {
+      "value": 100
+    },
+    "class_type": "easy int",
+    "_meta": {
+      "title": "整数"
+    }
+  },
+  "521": {
+    "inputs": {
+      "masks": [
+        "32",
+        0
+      ]
+    },
+    "class_type": "Mask Fill Holes",
+    "_meta": {
+      "title": "遮罩填充漏洞"
+    }
+  },
+  "537": {
+    "inputs": {
+      "model_path": "svdq-int4-flux.1-fill-dev",
+      "cache_threshold": 0.12,
+      "attention": "nunchaku-fp16",
+      "cpu_offload": "auto",
+      "device_id": 0,
+      "data_type": "bfloat16",
+      "i2f_mode": "enabled"
+    },
+    "class_type": "NunchakuFluxDiTLoader",
+    "_meta": {
+      "title": "Nunchaku FLUX DiT Loader"
+    }
+  },
+  "541": {
+    "inputs": {
+      "aspect_ratio": "original",
+      "proportional_width": 1,
+      "proportional_height": 1,
+      "fit": "letterbox",
+      "method": "lanczos",
+      "round_to_multiple": "8",
+      "scale_to_side": "height",
+      "scale_to_length": [
+        "453",
+        0
+      ],
+      "background_color": "#000000",
+      "mask": [
+        "17",
+        1
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "按宽高比缩放_V2"
+    }
+  },
+  "543": {
+    "inputs": {
+      "channel": "red",
+      "image": [
+        "544",
+        0
+      ]
+    },
+    "class_type": "ImageToMask",
+    "_meta": {
+      "title": "图像到遮罩"
+    }
+  },
+  "544": {
+    "inputs": {
+      "aspect_ratio": "original",
+      "proportional_width": 1,
+      "proportional_height": 1,
+      "fit": "letterbox",
+      "method": "lanczos",
+      "round_to_multiple": "8",
+      "scale_to_side": "height",
+      "scale_to_length": [
+        "453",
+        0
+      ],
+      "background_color": "#ffffff"
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "按宽高比缩放_V2"
+    }
+  },
+  "555": {
+    "inputs": {
+      "model_type": "flux.1",
+      "text_encoder1": "clip_l.safetensors",
+      "text_encoder2": "t5xxl_fp8_e4m3fn.safetensors",
+      "t5_min_length": 512
+    },
+    "class_type": "NunchakuTextEncoderLoaderV2",
+    "_meta": {
+      "title": "Nunchaku Text Encoder Loader V2"
+    }
+  },
+  "556": {
+    "inputs": {
+      "sam_model": "sam_vit_h (2.56GB)",
+      "grounding_dino_model": "GroundingDINO_SwinT_OGC (694MB)",
+      "threshold": 0.3,
+      "detail_method": "VITMatte",
+      "detail_erode": 6,
+      "detail_dilate": 6,
+      "black_point": 0.15,
+      "white_point": 0.99,
+      "process_detail": true,
+      "prompt": [
+        "557",
+        0
+      ],
+      "device": "cuda",
+      "max_megapixels": 2,
+      "cache_model": false,
+      "image": [
+        "46",
+        0
+      ]
+    },
+    "class_type": "LayerMask: SegmentAnythingUltra V2",
+    "_meta": {
+      "title": "SegmentAnything Ultra V2"
+    }
+  },
+  "557": {
+    "inputs": {
+      "text": "T恤",
+      "choose_to_language": "en"
+    },
+    "class_type": "BaiduTransApi",
+    "_meta": {
+      "title": "百度翻译Api"
+    }
+  }
+}
