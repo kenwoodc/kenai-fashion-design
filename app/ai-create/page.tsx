@@ -3,13 +3,11 @@
 import { useState } from 'react';
 import { Sparkles, Image, Palette } from 'lucide-react';
 import Link from 'next/link';
-import {
-  TextToImageGenerator,
-  SketchToImageGenerator,
-  ColoredSketchToImageGenerator,
-  FabricApplicationGenerator,
-  ModelDressingGenerator
-} from '@/components';
+import TextToImageGenerator from '../../components/TextToImageGenerator';
+import SketchToImageGenerator from '../../components/SketchToImageGenerator';
+import ColoredSketchToImageGenerator from '../../components/ColoredSketchToImageGenerator';
+import FabricApplicationGenerator from '../../components/FabricApplicationGenerator';
+import ModelDressingGenerator from '../../components/ModelDressingGenerator';
 
 /**
  * AI创作页面组件
