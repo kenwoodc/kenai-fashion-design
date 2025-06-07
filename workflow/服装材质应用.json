@@ -1,0 +1,308 @@
+{
+  "3": {
+    "inputs": {
+      "preset": "PLUS (high strength)",
+      "model": [
+        "4",
+        0
+      ]
+    },
+    "class_type": "IPAdapterUnifiedLoader",
+    "_meta": {
+      "title": "IPAdapter加载器"
+    }
+  },
+  "4": {
+    "inputs": {
+      "ckpt_name": "XL\\juggernautXL_juggXIByRundiffusion.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Checkpoint加载器(简易)"
+    }
+  },
+  "5": {
+    "inputs": {
+      "text": [
+        "6",
+        0
+      ],
+      "speak_and_recognation": true,
+      "clip": [
+        "4",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "6": {
+    "inputs": {
+      "text": [
+        "26",
+        0
+      ],
+      "choose_to_language": "en",
+      "speak_and_recognation": true
+    },
+    "class_type": "BaiduTransApi",
+    "_meta": {
+      "title": "百度翻译Api"
+    }
+  },
+  "7": {
+    "inputs": {
+      "text": "Worst quality, low quality, poor proportion, blurry,horror,(nude,naked,nsfw),lowres,bad anatomy,bad hands,text,error,missing fingers,extra digit,fewer digits,cropped,worst quality,low quality,normal quality,jpeg artifacts,signature,watermark,username,blurry,Ugly, zombie,horror,",
+      "speak_and_recognation": true,
+      "clip": [
+        "4",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码器"
+    }
+  },
+  "8": {
+    "inputs": {
+      "strength": 1,
+      "start_percent": 0,
+      "end_percent": 1,
+      "positive": [
+        "5",
+        0
+      ],
+      "negative": [
+        "7",
+        0
+      ],
+      "control_net": [
+        "9",
+        0
+      ],
+      "image": [
+        "10",
+        0
+      ]
+    },
+    "class_type": "ControlNetApplyAdvanced",
+    "_meta": {
+      "title": "ControlNet应用（旧版高级）"
+    }
+  },
+  "9": {
+    "inputs": {
+      "control_net_name": "controlnet-union-sdxl-1.0-promax.safetensors"
+    },
+    "class_type": "ControlNetLoader",
+    "_meta": {
+      "title": "ControlNet加载器"
+    }
+  },
+  "10": {
+    "inputs": {
+      "preprocessor": "LineArtPreprocessor",
+      "resolution": 768,
+      "image": [
+        "76",
+        0
+      ]
+    },
+    "class_type": "AIO_Preprocessor",
+    "_meta": {
+      "title": "Aux集成预处理器"
+    }
+  },
+  "11": {
+    "inputs": {
+      "image": "pasted/image (150).png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "12": {
+    "inputs": {
+      "seed": 343509419282217,
+      "steps": 20,
+      "cfg": 5,
+      "sampler_name": "euler",
+      "scheduler": "karras",
+      "denoise": 1,
+      "model": [
+        "31",
+        0
+      ],
+      "positive": [
+        "8",
+        0
+      ],
+      "negative": [
+        "8",
+        1
+      ],
+      "latent_image": [
+        "51",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "K采样器"
+    }
+  },
+  "14": {
+    "inputs": {
+      "samples": [
+        "12",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE解码"
+    }
+  },
+  "16": {
+    "inputs": {
+      "sam_model": "sam_vit_h (2.56GB)",
+      "grounding_dino_model": "GroundingDINO_SwinT_OGC (694MB)",
+      "threshold": 0.3,
+      "detail_method": "VITMatte",
+      "detail_erode": 6,
+      "detail_dilate": 6,
+      "black_point": 0.15,
+      "white_point": 0.99,
+      "process_detail": true,
+      "prompt": "shirt,jacket,pants,skirt",
+      "device": "cuda",
+      "max_megapixels": 2,
+      "cache_model": false,
+      "image": [
+        "76",
+        0
+      ]
+    },
+    "class_type": "LayerMask: SegmentAnythingUltra V2",
+    "_meta": {
+      "title": "SegmentAnything Ultra V2"
+    }
+  },
+  "17": {
+    "inputs": {
+      "image": "山羊牛仔纹双色正面.jpg",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "26": {
+    "inputs": {
+      "text": "皮衣",
+      "speak_and_recognation": true
+    },
+    "class_type": "TextInput_",
+    "_meta": {
+      "title": "文本"
+    }
+  },
+  "30": {
+    "inputs": {
+      "pixels": [
+        "76",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEEncode",
+    "_meta": {
+      "title": "VAE编码"
+    }
+  },
+  "31": {
+    "inputs": {
+      "weight": 1,
+      "weight_type": "style transfer precise",
+      "combine_embeds": "concat",
+      "start_at": 0,
+      "end_at": 1,
+      "embeds_scaling": "V only",
+      "model": [
+        "3",
+        0
+      ],
+      "ipadapter": [
+        "3",
+        1
+      ],
+      "image": [
+        "17",
+        0
+      ],
+      "attn_mask": [
+        "16",
+        1
+      ]
+    },
+    "class_type": "IPAdapterAdvanced",
+    "_meta": {
+      "title": "应用IPAdapter（高级）"
+    }
+  },
+  "51": {
+    "inputs": {
+      "pixels": [
+        "76",
+        0
+      ],
+      "vae": [
+        "4",
+        2
+      ]
+    },
+    "class_type": "VAEEncode",
+    "_meta": {
+      "title": "VAE编码"
+    }
+  },
+  "52": {
+    "inputs": {
+      "images": [
+        "14",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "76": {
+    "inputs": {
+      "upscale_method": "nearest-exact",
+      "megapixels": 1,
+      "image": [
+        "11",
+        0
+      ]
+    },
+    "class_type": "ImageScaleToTotalPixels",
+    "_meta": {
+      "title": "图像按像素缩放"
+    }
+  }
+}

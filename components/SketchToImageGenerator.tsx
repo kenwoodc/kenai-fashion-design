@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Send, Download, RefreshCw, Sparkles, Monitor, Hash, X, ZoomIn } from 'lucide-react';
+import { Send, Download, RefreshCw, Sparkles, Upload, Image as ImageIcon, ZoomIn, X } from 'lucide-react';
 import axios from 'axios';
 
 interface GenerationResult {
@@ -9,8 +9,7 @@ interface GenerationResult {
   prompt: string;
   images: string[];
   timestamp: number;
-  aspectRatio: string;
-  imageCount: number;
+  uploadedImage: string;
 }
 
 interface WorkItem {
@@ -18,87 +17,9 @@ interface WorkItem {
   prompt: string;
   images: string[];
   timestamp: number;
-  type: 'text-to-image';
+  type: 'sketch-to-image';
+  uploadedImage: string;
 }
-
-// 画面比例配置
-const ASPECT_RATIOS: Record<string, { label: string; icon: JSX.Element }> = {
-  "1:2": { 
-    label: "1:2", 
-    icon: (
-      <svg width="16" height="24" viewBox="0 0 16 24" className="inline-block">
-        <rect x="2" y="2" width="12" height="20" fill="none" stroke="black" strokeWidth="2"/>
-      </svg>
-    )
-  },
-  "9:16": { 
-    label: "9:16", 
-    icon: (
-      <svg width="16" height="24" viewBox="0 0 16 24" className="inline-block">
-        <rect x="2" y="2" width="12" height="20" fill="none" stroke="black" strokeWidth="2"/>
-      </svg>
-    )
-  },
-  "2:3": { 
-    label: "2:3", 
-    icon: (
-      <svg width="16" height="22" viewBox="0 0 16 22" className="inline-block">
-        <rect x="2" y="2" width="12" height="18" fill="none" stroke="black" strokeWidth="2"/>
-      </svg>
-    )
-  },
-  "3:4": { 
-    label: "3:4", 
-    icon: (
-      <svg width="18" height="22" viewBox="0 0 18 22" className="inline-block">
-        <rect x="2" y="2" width="14" height="18" fill="none" stroke="black" strokeWidth="2"/>
-      </svg>
-    )
-  },
-  "1:1": { 
-    label: "1:1", 
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 20 20" className="inline-block">
-        <rect x="2" y="2" width="16" height="16" fill="none" stroke="black" strokeWidth="2"/>
-      </svg>
-    )
-  },
-  "4:3": { 
-    label: "4:3", 
-    icon: (
-      <svg width="22" height="18" viewBox="0 0 22 18" className="inline-block">
-        <rect x="2" y="2" width="18" height="14" fill="none" stroke="black" strokeWidth="2"/>
-      </svg>
-    )
-  },
-  "3:2": { 
-    label: "3:2", 
-    icon: (
-      <svg width="22" height="16" viewBox="0 0 22 16" className="inline-block">
-        <rect x="2" y="2" width="18" height="12" fill="none" stroke="black" strokeWidth="2"/>
-      </svg>
-    )
-  },
-  "16:9": { 
-    label: "16:9", 
-    icon: (
-      <svg width="24" height="16" viewBox="0 0 24 16" className="inline-block">
-        <rect x="2" y="2" width="20" height="12" fill="none" stroke="black" strokeWidth="2"/>
-      </svg>
-    )
-  },
-  "2:1": { 
-    label: "2:1", 
-    icon: (
-      <svg width="24" height="14" viewBox="0 0 24 14" className="inline-block">
-        <rect x="2" y="2" width="20" height="10" fill="none" stroke="black" strokeWidth="2"/>
-      </svg>
-    )
-  }
-};
-
-// 出图数量选项
-const IMAGE_COUNT_OPTIONS = [1, 2, 4];
 
 /**
  * 保存作品到localStorage
@@ -115,23 +36,45 @@ const saveWorkToStorage = (work: WorkItem) => {
 };
 
 /**
- * 文生图生成器组件
+ * 线稿生图生成器组件
  */
-export default function TextToImageGenerator() {
-  const [prompt, setPrompt] = useState('');
-  const [aspectRatio, setAspectRatio] = useState('1:1');
-  const [imageCount, setImageCount] = useState(1);
+export default function SketchToImageGenerator() {
+  const [sketchPrompt, setSketchPrompt] = useState('');
+  const [uploadedSketch, setUploadedSketch] = useState<string | null>(null);
+  const [uploadedSketchFile, setUploadedSketchFile] = useState<File | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [results, setResults] = useState<GenerationResult[]>([]);
   const [error, setError] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  
+  // 引用
+  const sketchFileInputRef = useRef<HTMLInputElement>(null);
 
   /**
-   * 生成图片 - 文生图
+   * 处理线稿图片上传
    */
-  const handleTextToImageGenerate = async () => {
-    if (!prompt.trim()) {
-      setError('请输入描述文字');
+  const handleSketchUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setUploadedSketchFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploadedSketch(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  /**
+   * 生成图片 - 线稿生图
+   */
+  const handleSketchToImageGenerate = async () => {
+    if (!sketchPrompt.trim()) {
+      setError('请输入服装描述');
+      return;
+    }
+    if (!uploadedSketchFile) {
+      setError('请上传线稿图片');
       return;
     }
 
@@ -139,25 +82,38 @@ export default function TextToImageGenerator() {
     setError('');
 
     try {
-      // 读取工作流配置
-      const workflowResponse = await fetch('/workflow/文生图.json');
+      // 首先上传图片到ComfyUI
+      const formData = new FormData();
+      formData.append('image', uploadedSketchFile);
+      formData.append('type', 'input');
+      formData.append('subfolder', '');
+
+      const uploadResponse = await axios.post('/api/comfyui/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      const uploadedImageName = uploadResponse.data.name;
+
+      // 读取线稿生图工作流配置
+      const workflowResponse = await fetch('/workflow/线稿生图.json');
       const workflow = await workflowResponse.json();
 
-      // 更新工作流中的提示词
-      if (workflow['11'] && workflow['11'].inputs) {
-        workflow['11'].inputs.text = prompt;
+      // 更新工作流中的图片
+      if (workflow['1'] && workflow['1'].inputs) {
+        workflow['1'].inputs.image = uploadedImageName;
       }
 
-      // 设置画面比例和出图数量（节点4：EmptyLatentSizePicker）
-      if (workflow['4'] && workflow['4'].inputs) {
-        workflow['4'].inputs.image_ratio = aspectRatio;
-        workflow['4'].inputs.batch_size = imageCount;
+      // 更新工作流中的提示词
+      if (workflow['6'] && workflow['6'].inputs) {
+        workflow['6'].inputs.text = sketchPrompt;
       }
 
       // 生成随机种子
       const seed = Math.floor(Math.random() * 1000000000000000);
-      if (workflow['3'] && workflow['3'].inputs) {
-        workflow['3'].inputs.seed = seed;
+      if (workflow['10'] && workflow['10'].inputs) {
+        workflow['10'].inputs.seed = seed;
       }
 
       // 发送到ComfyUI
@@ -213,20 +169,20 @@ export default function TextToImageGenerator() {
                 const newResult: GenerationResult = {
                   id: `work-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                   images,
-                  prompt,
+                  prompt: sketchPrompt,
                   timestamp: Date.now(),
-                  aspectRatio,
-                  imageCount
+                  uploadedImage: uploadedSketch!
                 };
                 setResults(prev => [newResult, ...prev]);
 
                 // 保存到localStorage
                 const workItem: WorkItem = {
                   id: `work-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                  prompt,
+                  prompt: sketchPrompt,
                   images,
                   timestamp: Date.now(),
-                  type: 'text-to-image'
+                  type: 'sketch-to-image',
+                  uploadedImage: uploadedSketch!
                 };
                 saveWorkToStorage(workItem);
                 resolve();
@@ -267,7 +223,7 @@ export default function TextToImageGenerator() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `kenai-${prompt.slice(0, 20)}-${Date.now()}.png`;
+      a.download = `kenai-sketch-${prompt.slice(0, 20)}-${Date.now()}.png`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -289,82 +245,69 @@ export default function TextToImageGenerator() {
     <div className="flex h-full gap-6">
       {/* 左侧：参数设置 */}
       <div className="w-96 flex-shrink-0 space-y-6">
-        {/* 提示词输入 */}
+        {/* 图片上传 */}
         <div>
-          <label htmlFor="prompt" className="block text-sm font-medium text-gray-700 mb-2">
-            提示词
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            <Upload className="inline h-4 w-4 mr-1" />
+            上传服装线稿图
+          </label>
+          <div className="space-y-4">
+            <div
+              onClick={() => sketchFileInputRef.current?.click()}
+              className={`
+                border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all duration-200
+                ${uploadedSketch 
+                  ? 'border-blue-300 bg-blue-50' 
+                  : 'border-gray-300 hover:border-gray-400 bg-gray-50 hover:bg-gray-100'
+                }
+                ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}
+              `}
+            >
+              {uploadedSketch ? (
+                <div className="space-y-3">
+                  <img
+                    src={uploadedSketch}
+                    alt="上传的线稿"
+                    className="max-h-48 mx-auto rounded-lg border border-gray-200"
+                  />
+                  <p className="text-sm text-blue-600">点击重新上传</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <ImageIcon className="h-12 w-12 text-gray-400 mx-auto" />
+                  <div>
+                    <p className="text-gray-600">点击上传线稿图片</p>
+                    <p className="text-sm text-gray-400">支持 JPG、PNG 格式</p>
+                  </div>
+                </div>
+              )}
+            </div>
+            <input
+              ref={sketchFileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleSketchUpload}
+              className="hidden"
+              disabled={isGenerating}
+            />
+          </div>
+        </div>
+
+        {/* 服装描述 */}
+        <div>
+          <label htmlFor="sketchPrompt" className="block text-sm font-medium text-gray-700 mb-2">
+            描述服装
           </label>
           <div className="relative">
             <textarea
-              id="prompt"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="请描述您想要生成的服装设计..."
+              id="sketchPrompt"
+              value={sketchPrompt}
+              onChange={(e) => setSketchPrompt(e.target.value)}
+              placeholder="请描述您想要生成的服装样式、颜色、材质等..."
               className="input min-h-[120px] resize-none pr-12"
               disabled={isGenerating}
             />
             <Sparkles className="absolute top-3 right-3 h-5 w-5 text-gray-400" />
-          </div>
-        </div>
-
-        {/* 参数设置区域 */}
-        <div className="space-y-4">
-          {/* 画面比例选择 */}
-          <div>
-            <label htmlFor="aspectRatio" className="block text-sm font-medium text-gray-700 mb-2">
-              <Monitor className="inline h-4 w-4 mr-1" />
-              画面比例
-            </label>
-            <div className="flex items-center gap-3">
-              <select
-                id="aspectRatio"
-                value={aspectRatio}
-                onChange={(e) => setAspectRatio(e.target.value)}
-                disabled={isGenerating}
-                className="input flex-1"
-              >
-                {Object.entries(ASPECT_RATIOS).map(([ratio, config]) => (
-                  <option key={ratio} value={ratio}>
-                    {config.label}
-                  </option>
-                ))}
-              </select>
-              <div className={`flex items-center justify-center w-8 h-8 bg-gray-50 rounded border relative ${
-                isGenerating ? 'opacity-50' : ''
-              }`}>
-                {isGenerating ? (
-                  <>
-                    {ASPECT_RATIOS[aspectRatio].icon}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="loading-spinner w-4 h-4" />
-                    </div>
-                  </>
-                ) : (
-                  ASPECT_RATIOS[aspectRatio].icon
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* 出图数量选择 */}
-          <div>
-            <label htmlFor="imageCount" className="block text-sm font-medium text-gray-700 mb-2">
-              <Hash className="inline h-4 w-4 mr-1" />
-              出图数量
-            </label>
-            <select
-              id="imageCount"
-              value={imageCount}
-              onChange={(e) => setImageCount(Number(e.target.value))}
-              disabled={isGenerating}
-              className="input w-full"
-            >
-              {IMAGE_COUNT_OPTIONS.map((count) => (
-                <option key={count} value={count}>
-                  {count}
-                </option>
-              ))}
-            </select>
           </div>
         </div>
 
@@ -378,8 +321,8 @@ export default function TextToImageGenerator() {
         {/* 操作按钮 */}
         <div className="flex flex-col gap-3">
           <button
-            onClick={handleTextToImageGenerate}
-            disabled={isGenerating || !prompt.trim()}
+            onClick={handleSketchToImageGenerate}
+            disabled={isGenerating || !sketchPrompt.trim() || !uploadedSketchFile}
             className="btn-primary flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed w-full"
           >
             {isGenerating ? (
@@ -423,18 +366,20 @@ export default function TextToImageGenerator() {
                         {new Date(result.timestamp).toLocaleString('zh-CN')}
                       </p>
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                        文生图
-                      </span>
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {result.aspectRatio}
-                      </span>
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        {result.imageCount} 张
+                        线稿生图
                       </span>
                     </div>
                     <p className="text-gray-800 bg-gray-50 rounded-lg p-3 text-sm">
                       {result.prompt}
                     </p>
+                    <div className="mt-3">
+                      <p className="text-sm text-gray-600 mb-2">原始线稿：</p>
+                      <img
+                        src={result.uploadedImage}
+                        alt="原始线稿"
+                        className="h-24 w-auto rounded border border-gray-200"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -486,9 +431,9 @@ export default function TextToImageGenerator() {
         ) : (
           <div className="flex items-center justify-center h-full">
             <div className="text-center text-gray-500">
-              <Sparkles className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p className="text-lg font-medium mb-2">开始您的创作之旅</p>
-              <p className="text-sm">输入提示词并点击生成图片</p>
+              <Upload className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p className="text-lg font-medium mb-2">上传线稿开始创作</p>
+              <p className="text-sm">上传服装线稿图并添加描述</p>
             </div>
           </div>
         )}
@@ -530,4 +475,4 @@ export default function TextToImageGenerator() {
       )}
     </div>
   );
-}
+} 
